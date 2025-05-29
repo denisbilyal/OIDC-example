@@ -1,3 +1,4 @@
+import './GoogleLoginButton.css'; // използва споделен стил
 
 const GoogleLoginButton = () => {
   const handleGoogleLogin = () => {
@@ -5,12 +6,13 @@ const GoogleLoginButton = () => {
   };
 
   return (
-    <div>
-      <h2>Login</h2>
-      <button onClick={handleGoogleLogin}>Login with Google</button>
+    <div className="login-form google-form">
+      <h2 className="login-title">Вход с Google</h2>
+      <button className="google-button" onClick={handleGoogleLogin}>
+        Вход чрез Google
+      </button>
     </div>
   );
 };
-
 
 export default GoogleLoginButton;

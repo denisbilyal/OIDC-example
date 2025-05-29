@@ -20,7 +20,6 @@ router.get('/me', authenticateToken, async (req: Request, res: Response) => {
 });
 
 
-// 1. START AUTH FLOW
 router.get('/google', (req: Request, res: Response) => {
   
   const client = new OAuth2Client({
@@ -38,7 +37,6 @@ router.get('/google', (req: Request, res: Response) => {
   res.redirect(authorizeUrl);
 });
 
-// 2. HANDLE REDIRECT
 router.get('/google/callback', async (req: Request, res: Response) => {
   const client = new OAuth2Client({
   clientId: process.env.GOOGLE_CLIENT_ID!,

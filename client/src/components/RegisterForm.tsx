@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import './RegisterForm.css'; // използваме един и същ CSS или отделен, ако искаш
 
 const RegisterForm = () => {
   const [form, setForm] = useState({
@@ -8,9 +9,6 @@ const RegisterForm = () => {
     password: '',
     firstName: '',
     lastName: '',
-    birthDate: '',
-    address: '',
-    workAddress: '',
   });
 
   const navigate = useNavigate();
@@ -26,21 +24,51 @@ const RegisterForm = () => {
       localStorage.setItem('token', res.data.token);
       navigate('/profile');
     } catch (err) {
-      alert('Registration failed.');
+      alert('Регистрацията не бе успешна.');
     }
   };
 
   return (
-    <form onSubmit={handleRegister}>
-      <h2>Register</h2>
-      <input name="email" placeholder="Email" type="email" onChange={handleChange} required />
-      <input name="password" placeholder="Password" type="password" onChange={handleChange} required />
-      <input name="firstName" placeholder="First Name" onChange={handleChange} />
-      <input name="lastName" placeholder="Last Name" onChange={handleChange} />
-      <input name="birthDate" type="date" onChange={handleChange} />
-      <input name="address" placeholder="Address" onChange={handleChange} />
-      <input name="workAddress" placeholder="Work Address" onChange={handleChange} />
-      <button type="submit">Register</button>
+    <form className="login-form" onSubmit={handleRegister}>
+      <h2 className="login-title">Регистрация</h2>
+
+      <input
+        className="login-input"
+        name="email"
+        placeholder="Email"
+        type="email"
+        onChange={handleChange}
+        required
+      />
+
+      <input
+        className="login-input"
+        name="password"
+        placeholder="Парола"
+        type="password"
+        onChange={handleChange}
+        required
+      />
+
+      <input
+        className="login-input"
+        name="firstName"
+        placeholder="Име"
+        onChange={handleChange}
+        required
+      />
+
+      <input
+        className="login-input"
+        name="lastName"
+        placeholder="Фамилия"
+        onChange={handleChange}
+        required
+      />
+
+      <button className="login-button" type="submit">
+        Регистрация
+      </button>
     </form>
   );
 };
