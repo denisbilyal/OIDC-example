@@ -1,63 +1,84 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
 
-interface User {
+interface UserProfile {
   email: string;
-  firstName?: string;
-  lastName?: string;
+  firstName: string;
+  lastName: string;
   birthDate?: string;
-  address?: string;
+  homeAddress?: string;
   workAddress?: string;
-  provider: string;
 }
 
-const ProfilePage = () => {
-  const [user, setUser] = useState<User | null>(null);
+const ProfilePage: React.FC = () => {
+  const [user, setUser] = useState<UserProfile | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const location = useLocation();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchProfile = async () => {
-      const token = localStorage.getItem('token');
-      if (!token) return navigate('/');
+  const [justLoggedIn, setJustLoggedIn] = useState(false);
 
-      try {
-        const res = await axios.get('http://localhost:5000/api/auth/profile', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setUser(res.data);
-      } catch (err) {
-        alert('Invalid or expired token');
-        localStorage.removeItem('token');
-        navigate('/');
-      }
-    };
+useEffect(() => {
+  const params = new URLSearchParams(location.search);
+  const tokenFromUrl = params.get('token');
 
-    fetchProfile();
-  }, [navigate]);
+  if (tokenFromUrl) {
+    localStorage.setItem('token', tokenFromUrl);
+    setJustLoggedIn(true);
+    navigate('/profile', { replace: true });
+  }
+}, [location, navigate]);
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    navigate('/');
+useEffect(() => {
+  const fetchProfile = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/auth');
+      return;
+    }
+
+    try {
+      const res = await axios.get('http://localhost:5000/api/auth/profile', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setUser(res.data);
+    } catch (err) {
+      console.error('Failed to fetch profile:', err);
+      localStorage.removeItem('token');
+      navigate('/');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  if (!user) return <p>Loading...</p>;
+  fetchProfile();
+}, [navigate, justLoggedIn]); // добави justLoggedIn тук
+
+  if (loading) return <p>Loading...</p>;
+
+  if (!user) return <p>Потребител не е намерен.</p>;
 
   return (
     <div>
-      <h2>Welcome, {user.firstName || user.email}!</h2>
-      <ul>
-        <li>Email: {user.email}</li>
-        <li>First Name: {user.firstName}</li>
-        <li>Last Name: {user.lastName}</li>
-        <li>Birth Date: {user.birthDate?.slice(0, 10)}</li>
-        <li>Address: {user.address}</li>
-        <li>Work Address: {user.workAddress}</li>
-        <li>Provider: {user.provider}</li>
-      </ul>
-      <button onClick={handleLogout}>Logout</button>
+      <h2>Добре дошъл, {user.firstName} {user.lastName}</h2>
+      <p><strong>Имейл:</strong> {user.email}</p>
+      <p><strong>Име:</strong> {user.firstName}</p>
+      <p><strong>Фамилия:</strong> {user.lastName}</p>
+      <p><strong>Рождена дата:</strong> {user.birthDate || 'няма въведена'}</p>
+      <p><strong>Домашен адрес:</strong> {user.homeAddress || 'няма въведен'}</p>
+      <p><strong>Работен адрес:</strong> {user.workAddress || 'няма въведен'}</p>
+      <button
+        onClick={() => {
+          localStorage.removeItem('token');
+          navigate('/');
+        }}
+      >
+        Logout
+      </button>
     </div>
   );
 };

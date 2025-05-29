@@ -1,5 +1,11 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
+import { Request } from 'express';
+
+export interface AuthenticatedRequest extends Request {
+  userId?: string; // или userId: string ако винаги го има
+}
+
 export interface IUser extends Document {
   email: string;
   passwordHash?: string;
